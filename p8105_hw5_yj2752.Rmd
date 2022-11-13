@@ -2,5 +2,32 @@
 title: "P8105_hw5_yj2752"
 author: "Yixuan Jiao"
 output: github_document
-date: "2022-11-13"
 ---
+
+```{r}
+library(purrr)
+library(tidyverse)
+```
+
+
+## Problem1
+Reading all csv merge them into a single file
+```{r}
+exp_table <- 
+  tibble(id = list.files("./data")) %>%
+  mutate(file_dir = str_c("./data/",id)) %>%
+  mutate(data = map(file_dir, read_csv)) %>%
+  unnest(data)
+```
+Tidy the table
+```{r}
+exp_table_tidy <- 
+  exp_table %>%
+  select(-file_dir) %>%
+  mutate(id = str_replace(id,".csv","")) %>%
+  separate(id,into = c("group","id"), sep = "_") %>%
+  pivot_longer(week_1:week_8,names_to = "week", names_prefix = "week_",values_to = "data") 
+```
+
+## Problem2
+
