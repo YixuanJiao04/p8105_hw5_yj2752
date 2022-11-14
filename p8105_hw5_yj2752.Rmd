@@ -7,6 +7,7 @@ output: github_document
 ```{r}
 library(purrr)
 library(tidyverse)
+set.seed(42)
 ```
 
 
@@ -86,5 +87,27 @@ cases_prop %>%
   geom_point() +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+## Problem3
+Firstly, write a function for simulate normal distribution and generate test statistics and p-value.
+```{r}
+norm_sim <- function(mu, n = 30, sd = 5) {
+  x <- rnorm(n,mean = mu, sd = sd)
+  x %>%
+    t.test(mu = mu) %>%
+    broom::tidy() %>%
+    select(estimate,p.value)
+}
+```
+Iterate 5000 times for $\mu = \{0,1,2,3,4,5,6\}$
+```{r}
+expand_grid(
+  mu =0:6,
+  iteration = 1:5000
+) %>%
+  mutate(sim_result = map(mu,norm_sim)) %>%
+  unnest(sim_result) %>% 
+  select(-iteration)
 ```
 
