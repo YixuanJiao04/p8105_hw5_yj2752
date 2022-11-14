@@ -58,12 +58,33 @@ total <-
   homicide %>%
     group_by(city_state) %>%
     summarise(total = n())
+
 cases_prop <- 
   full_join(total,unsolved) %>%
   replace(is.na(.),0)
 ```
-
+Use `prop.test()` to estimate the proportion of unsolved cases and its confidence interval for Baltimor,MD. Use select to only pull out the estimate and confidence interval
 ```{r}
-
+baltimore_prop <- prop.test(1825,2827)
+broom::tidy(baltimore_prop) %>%
+  select(estimate,conf.low,conf.high)
+```
+Now apply `porp.test()` to every cities in the table, then pull out the estimate and confidence interval by `map2()` and `map()` function, then unnest the tibble and select the desired column.
+```{r}
+cases_prop <- 
+  cases_prop %>%
+  mutate(prop_test = map2(.x = unsolved, .y = total, ~prop.test(x = .x, n = .y))) %>%
+  mutate(prop_test = map(prop_test,broom::tidy)) %>%
+  unnest(prop_test) %>%
+  select(city_state,estimate,conf.low,conf.high)
+```
+Reorder the cities by the value of estimate proportion then generate the point plot with error bar, presenting the estimate proportion of unsolved homicide cases of each state.
+```{r}
+cases_prop %>%
+  mutate(city_state = fct_reorder(city_state,estimate)) %>%
+  ggplot(aes(x = city_state, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
