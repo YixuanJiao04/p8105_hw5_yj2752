@@ -13,7 +13,7 @@ set.seed(42)
 
 ## Problem1
 Reading all csv merge them into a single file
-```{r}
+```{r message = FALSE}
 exp_table <- 
   tibble(id = list.files("./data")) %>%
   mutate(file_dir = str_c("./data/",id)) %>%
@@ -102,12 +102,36 @@ norm_sim <- function(mu, n = 30, sd = 5) {
 ```
 Iterate 5000 times for $\mu = \{0,1,2,3,4,5,6\}$
 ```{r}
-expand_grid(
-  mu =0:6,
-  iteration = 1:5000
-) %>%
-  mutate(sim_result = map(mu,norm_sim)) %>%
-  unnest(sim_result) %>% 
-  select(-iteration)
+result_df <-
+  expand_grid(
+    mu =0:6,
+    iteration = 1:5000
+  ) %>%
+    mutate(sim_result = map(mu,norm_sim)) %>%
+    unnest(sim_result) %>% 
+    select(-iteration)
+```
+Use `summarise()` to get what we need for the plot ($\hat{\mu}$ and proportion of null rejection).
+```{r}
+result_df <-
+  result_df %>%
+    filter(p.value < 0.05) %>%
+    group_by(mu) %>%
+    summarise(mu_hat = mean(estimate),
+              rej_prop = n()/5000)
+```
+
+```{r}
+result_df %>%
+  ggplot(aes(x = mu,y = rej_prop)) +
+  geom_point() +
+  geom_smooth(method='lm',formula = y ~ x,se = FALSE)
+```
+
+```{r}
+result_df %>%
+  ggplot(aes(x = mu,y = mu_hat)) +
+  geom_point() +
+  geom_smooth(method='lm',formula = y ~ x,se = FALSE)
 ```
 
