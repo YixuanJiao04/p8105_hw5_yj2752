@@ -39,11 +39,12 @@ The raw data contain the victim's basic information(name,race,age,sex), and loca
 ```{r}
 skimr::skim(homicide)
 ```
-Adding `city_state` column
+Adding `city_state` column, and correct a potential input error.
 ```{r}
 homicide <- 
   homicide %>%
-  mutate(city_state = str_c(city,",",state))
+  mutate(city_state = str_c(city,",",state)) %>%
+  mutate(city_state = replace(city_state,city_state == "Tulsa,AL","Tulsa,OK"))
 ```
 Generate the table of number of unsolved cases by cities
 ```{r}
