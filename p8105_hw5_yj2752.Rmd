@@ -95,7 +95,7 @@ Firstly, write a function for simulate normal distribution and generate test sta
 norm_sim <- function(mu, n = 30, sd = 5) {
   x <- rnorm(n,mean = mu, sd = sd)
   x %>%
-    t.test(mu = mu) %>%
+    t.test(mu = 0) %>%
     broom::tidy() %>%
     select(estimate,p.value)
 }
@@ -132,7 +132,7 @@ result_df <- full_join(df_all,df_rej)
 result_df %>%
   ggplot(aes(x = mu,y = rej_prop)) +
   geom_point() +
-  geom_smooth(method='lm',formula = y ~ x,se = FALSE)
+  geom_smooth(se = FALSE)
 ```
 
 ```{r}
