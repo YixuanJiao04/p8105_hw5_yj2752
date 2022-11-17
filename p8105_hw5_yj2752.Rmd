@@ -7,7 +7,7 @@ output: github_document
 ```{r message=FALSE}
 library(purrr)
 library(tidyverse)
-set.seed(42)
+set.seed(2022)
 ```
 
 
