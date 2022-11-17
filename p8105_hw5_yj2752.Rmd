@@ -141,7 +141,7 @@ df_all <-
 
 result_df <- full_join(df_all,df_rej)
 ```
-As the effect size gets larger, the power (proportion of rejection) is getting larger. Since the distributions generated 
+As the effect size gets larger, the power (proportion of rejection) is getting larger. Since the distributions generated is the whole samples distribution is away from 0.
 ```{r warning = FALSE}
 result_df %>%
   ggplot(aes(x = mu,y = rej_prop)) +
